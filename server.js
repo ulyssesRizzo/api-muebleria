@@ -1,19 +1,19 @@
-require('dotenv').config();
-const app = require('./src/app');
-const { initDb } = require('./src/config/db');
+const app = require('./app');
+const { initPool } = require('./config/db');
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
-    try {
-        await initDb(); // Inicia la conexión a Oracle antes de levantar el servidor
-        app.listen(PORT, () => {
-            console.log(`🚀 Servidor MDA corriendo en el puerto ${PORT}`);
-        });
-    } catch (error) {
-        console.error('❌ Error crítico al arrancar el servidor:', error);
-        process.exit(1);
-    }
+  try {
+    await initPool(); // inicializa el pool
+    console.log('Conexión a Oracle establecida');
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('Error al conectar a Oracle:', err);
+    process.exit(1);
+  }
 }
 
 startServer();
