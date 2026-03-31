@@ -3,30 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muebles Los Alpes</title>
+    <title>Muebles Los Alpes - Sistema de Gestión</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>Muebles Los Alpes</h1>
-        <nav>
-            <a href="index.html">Inicio</a>
-            <a href="carrito.html">Carrito</a>
-            <a href="mis-compras.html">Mis Compras</a>
-            <span id="authLinks">
-                <a href="login.html">Login</a>
-                <a href="register.html">Registro</a>
-            </span>
-            <span id="userInfo" style="display:none;">
-                Bienvenido, <span id="usernameDisplay"></span>
-                <button id="logoutBtn">Cerrar sesión</button>
-            </span>
-        </nav>
-    </header>
-    <main>
-        <h2>Catálogo de Productos</h2>
-        <div id="productos"></div>
-    </main>
+    <div class="app-container">
+        <!-- Header con información de usuario -->
+        <header class="main-header">
+            <div class="logo">
+                <i class="fas fa-couch"></i>
+                <h1>Muebles Los Alpes</h1>
+            </div>
+            <div class="user-info" id="userInfo">
+                <span id="userNameDisplay"></span>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+            </div>
+            <div class="auth-buttons" id="authButtons">
+                <button id="showLoginBtn" class="btn-primary"><i class="fas fa-key"></i> Iniciar sesión</button>
+                <button id="showRegisterBtn" class="btn-secondary"><i class="fas fa-user-plus"></i> Registrarse</button>
+            </div>
+        </header>
+
+        <!-- Tabs de navegación (solo visibles cuando hay sesión) -->
+        <div class="tabs" id="tabsContainer" style="display: none;">
+            <button class="tab-btn active" data-tab="catalogo"><i class="fas fa-store"></i> Catálogo</button>
+            <button class="tab-btn" data-tab="carrito"><i class="fas fa-shopping-cart"></i> Carrito <span id="cartCount" class="cart-badge">0</span></button>
+            <button class="tab-btn" data-tab="mis-compras"><i class="fas fa-receipt"></i> Mis compras</button>
+            <button class="tab-btn" data-tab="clientes" id="adminClientesTab"><i class="fas fa-users"></i> Clientes</button>
+            <button class="tab-btn" data-tab="productos" id="adminProductosTab"><i class="fas fa-box"></i> Productos</button>
+            <button class="tab-btn" data-tab="inventario" id="adminInventarioTab"><i class="fas fa-warehouse"></i> Inventario</button>
+            <button class="tab-btn" data-tab="categorias" id="adminCategoriasTab"><i class="fas fa-tags"></i> Categorías</button>
+            <button class="tab-btn" data-tab="bodegas" id="adminBodegasTab"><i class="fas fa-building"></i> Bodegas</button>
+            <button class="tab-btn" data-tab="promociones" id="adminPromocionesTab"><i class="fas fa-percent"></i> Promociones</button>
+            <button class="tab-btn" data-tab="cupones" id="adminCuponesTab"><i class="fas fa-ticket-alt"></i> Cupones</button>
+            <button class="tab-btn" data-tab="reportes" id="adminReportesTab"><i class="fas fa-chart-line"></i> Reportes</button>
+        </div>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Pantallas de login/registro -->
+            <div id="loginScreen" class="screen">
+                <div class="form-card">
+                    <h2><i class="fas fa-key"></i> Iniciar sesión</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Usuario</label>
+                            <input type="text" id="loginUsername" required placeholder="Ingrese su usuario">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Contraseña</label>
+                            <input type="password" id="loginPassword" required placeholder="Ingrese su contraseña">
+                        </div>
+                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="registerScreen" class="screen" style="display: none;">
+                <div class="form-card">
+                    <h2><i class="fas fa-user-plus"></i> Registro de cliente</h2>
+                    <form id="registerForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tipo persona *</label>
+                                <select id="regTipoPersona" required>
+                                    <option value="N">Persona natural</option>
+                                    <option value="J">Persona jurídica</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo documento *</label>
+                                <select id="regTipoDocId" required></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Número documento *</label>
+                            <input type="text" id="regNumDocumento" required>
+                        </div>
+                        <div id="naturalFields">
+                            <div class="form-row">
+                                <div class="form-group"><label>Nombres *</label><input type="text" id="regNombres"></div>
+                                <div class="form-group"><label>Apellidos *</label><input type="text" id="regApellidos"></div>
+                            </div>
+                        </div>
+                        <div id="juridicaFields" style="display: none;">
+                            <div class="form-group"><label>NIT *</label><input type="text" id="regNit"></div>
+                            <div class="form-group"><label>Razón social *</label><input type="text" id="regRazonSocial"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Teléfono residencia *</label><input type="text" id="regTelRes" required></div>
+                            <div class="form-group"><label>Teléfono celular</label><input type="text" id="regTelCel"></div>
+                        </div>
+                        <div class="form-group"><label>Dirección *</label><input type="text" id="regDireccion" required></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Ciudad *</label><select id="regCiudadId" required></select></div>
+                            <div class="form-group"><label>Profesión</label><input type="text" id="regProfesion"></div>
+                        </div>
+                        <div class="form-group"><label>Email *</label><input type="email" id="regEmail" required></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Usuario *</label><input type="text" id="regUsername" required></div>
+                            <div class="form-group"><label>Contraseña *</label><input type="password" id="regPassword" required></div>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-check-circle"></i> Registrarse</button>
+                    </form>
+                    <p class="text-center">¿Ya tienes cuenta? <a href="#" id="switchToLogin">Inicia sesión</a></p>
+                </div>
+            </div>
+
+            <!-- Pantalla de catálogo -->
+            <div id="catalogoScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-store"></i> Catálogo de productos</h2>
+                    <div class="search-bar">
+                        <input type="text" id="catalogoSearch" placeholder="Buscar por nombre o referencia...">
+                        <select id="catalogoTipoFilter">
+                            <option value="">Todos los tipos</option>
+                        </select>
+                        <button id="searchCatalogoBtn" class="btn-secondary"><i class="fas fa-search"></i> Buscar</button>
+                    </div>
+                </div>
+                <div id="productosGrid" class="productos-grid"></div>
+            </div>
+
+            <!-- Pantalla de carrito -->
+            <div id="carritoScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-shopping-cart"></i> Mi carrito de compras</h2>
+                </div>
+                <div id="carritoContent"></div>
+            </div>
+
+            <!-- Pantalla de mis compras -->
+            <div id="misComprasScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-receipt"></i> Mis compras</h2>
+                </div>
+                <div id="misComprasContent"></div>
+            </div>
+
+            <!-- Pantalla de clientes (admin) -->
+            <div id="clientesScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-users"></i> Administración de clientes</h2>
+                    <button id="openCrearClienteModal" class="btn-primary"><i class="fas fa-plus"></i> Nuevo cliente</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="clientesSearch" placeholder="Buscar por documento, nombre o email...">
+                    <button id="searchClientesBtn" class="btn-secondary"><i class="fas fa-search"></i> Buscar</button>
+                    <label><input type="checkbox" id="clientesAdminMode"> Incluir inactivos</label>
+                </div>
+                <div id="clientesTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de productos (admin) -->
+            <div id="productosScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-box"></i> Administración de productos</h2>
+                    <button id="openCrearProductoModal" class="btn-primary"><i class="fas fa-plus"></i> Nuevo producto</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="productosSearch" placeholder="Buscar por nombre o referencia...">
+                    <select id="productosTipoFilter"></select>
+                    <button id="searchProductosBtn" class="btn-secondary"><i class="fas fa-search"></i> Buscar</button>
+                    <label><input type="checkbox" id="productosAdminMode"> Incluir inactivos</label>
+                </div>
+                <div id="productosTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de inventario (admin) -->
+            <div id="inventarioScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-warehouse"></i> Gestión de inventario</h2>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="inventarioSearch" placeholder="Buscar producto...">
+                    <button id="searchInventarioBtn" class="btn-secondary"><i class="fas fa-search"></i> Buscar</button>
+                </div>
+                <div id="inventarioTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de categorías (admin) -->
+            <div id="categoriasScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-tags"></i> Categorías</h2>
+                    <button id="openCrearCategoriaModal" class="btn-primary"><i class="fas fa-plus"></i> Nueva categoría</button>
+                </div>
+                <div id="categoriasTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de bodegas (admin) -->
+            <div id="bodegasScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-building"></i> Bodegas</h2>
+                    <button id="openCrearBodegaModal" class="btn-primary"><i class="fas fa-plus"></i> Nueva bodega</button>
+                </div>
+                <div id="bodegasTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de promociones (admin) -->
+            <div id="promocionesScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-percent"></i> Promociones</h2>
+                    <button id="openCrearPromocionModal" class="btn-primary"><i class="fas fa-plus"></i> Nueva promoción</button>
+                </div>
+                <div id="promocionesTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de cupones (admin) -->
+            <div id="cuponesScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-ticket-alt"></i> Cupones de descuento</h2>
+                    <button id="openCrearCuponModal" class="btn-primary"><i class="fas fa-plus"></i> Nuevo cupón</button>
+                </div>
+                <div id="cuponesTableContainer"></div>
+            </div>
+
+            <!-- Pantalla de reportes (admin) -->
+            <div id="reportesScreen" class="screen" style="display: none;">
+                <div class="screen-header">
+                    <h2><i class="fas fa-chart-line"></i> Reportes</h2>
+                </div>
+                <div class="reportes-container">
+                    <div class="reporte-card">
+                        <h3>Ventas diarias</h3>
+                        <div class="filtros">
+                            <input type="date" id="ventasFechaIni">
+                            <input type="date" id="ventasFechaFin">
+                            <select id="ventasCiudad"></select>
+                            <button id="generarVentasBtn" class="btn-primary">Generar</button>
+                        </div>
+                        <div id="ventasResultados"></div>
+                    </div>
+                    <div class="reporte-card">
+                        <h3>Producto más vendido</h3>
+                        <div class="filtros">
+                            <input type="date" id="productoFechaIni">
+                            <input type="date" id="productoFechaFin">
+                            <select id="productoCiudad"></select>
+                            <button id="generarProductoBtn" class="btn-primary">Generar</button>
+                        </div>
+                        <div id="productoResultados"></div>
+                    </div>
+                    <div class="reporte-card">
+                        <h3>Compras por cliente</h3>
+                        <div class="filtros">
+                            <input type="number" id="comprasClienteId" placeholder="ID del cliente">
+                            <input type="date" id="comprasFechaIni">
+                            <input type="date" id="comprasFechaFin">
+                            <button id="generarComprasBtn" class="btn-primary">Generar</button>
+                        </div>
+                        <div id="comprasResultados"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales para CRUD (se generan dinámicamente) -->
+    <div id="modalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
